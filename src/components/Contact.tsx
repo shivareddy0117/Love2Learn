@@ -32,6 +32,7 @@ export default function Contact() {
     setLoading(true);
 
     try {
+      // Try API first (works on full server deployment)
       const res = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,7 +54,14 @@ export default function Contact() {
         toast.error("Something went wrong. Please try again.");
       }
     } catch {
-      toast.error("Network error. Please try again.");
+      // Static site fallback — open mailto
+      const subject = encodeURIComponent(`Admission Inquiry: ${formData.childName} - ${formData.program}`);
+      const body = encodeURIComponent(
+        `Child's Name: ${formData.childName}\nChild's Age: ${formData.childAge}\nParent: ${formData.parentName}\nPhone: ${formData.phone}\nProgram: ${formData.program}\n\n${formData.message || "Please share admission details."}`
+      );
+      window.open(`mailto:hello@love2learn.school?subject=${subject}&body=${body}`, "_blank");
+      toast.success("🎉 Opening email to submit your inquiry!");
+      setFormData({ childName: "", childAge: "", parentName: "", email: "", phone: "", program: "", message: "" });
     } finally {
       setLoading(false);
     }
